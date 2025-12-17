@@ -261,13 +261,26 @@ public class GrpcClient {
      */
     private void connect() {
         try {
-            // Build channel
-            NettyChannelBuilder channelBuilder = NettyChannelBuilder.forAddress(host, port);
+            // Build channel using standard builder for better compatibility
+            io.grpc.ManagedChannelBuilder<?> channelBuilder = io.grpc.ManagedChannelBuilder
+                    .forAddress(host, port);
 
             // Configure TLS
             if (tlsEnabled) {
+                // For TLS, we need NettyChannelBuilder
+                NettyChannelBuilder nettyBuilder = NettyChannelBuilder.forAddress(host, port);
                 SslContext sslContext = buildSslContext();
-                channelBuilder.sslContext(sslContext);
+                nettyBuilder.sslContext(sslContext);
+                nettyBuilder.maxInboundMessageSize(maxInboundMessageSize)
+                        .idleTimeout(connectionTimeoutMs, TimeUnit.MILLISECONDS);
+                if (keepaliveTimeMs > 0) {
+                    nettyBuilder.keepAliveTime(keepaliveTimeMs, TimeUnit.MILLISECONDS)
+                            .keepAliveTimeout(keepaliveTimeoutMs, TimeUnit.MILLISECONDS)
+                            .keepAliveWithoutCalls(true);
+                }
+                channel = nettyBuilder.build();
+                startStreaming();
+                return;
             } else {
                 channelBuilder.usePlaintext();
             }

@@ -108,7 +108,9 @@ Full documentation is available at: **[conduktor.github.io/kafka-connect-grpc](h
 - [Monitoring & Operations](https://conduktor.github.io/kafka-connect-grpc/operations/RUNBOOK/)
 - [FAQ](https://conduktor.github.io/kafka-connect-grpc/faq/)
 
-## Building from Source
+## Development
+
+### Building from Source
 
 ```bash
 git clone https://github.com/conduktor/kafka-connect-grpc.git
@@ -117,6 +119,32 @@ mvn clean package
 ```
 
 Output: `target/kafka-connect-grpc-1.0.0-jar-with-dependencies.jar`
+
+### Running Tests
+
+```bash
+# Run unit tests
+mvn test
+
+# Run integration tests (requires Docker)
+mvn verify
+
+# Run specific test class
+mvn test -Dtest=GrpcSourceConnectorConfigTest
+```
+
+### Test Coverage
+
+The test suite includes:
+
+- **Unit Tests**: Configuration validation, connector lifecycle, task management
+- **Integration Tests**: gRPC client behavior, TLS configuration, proto descriptor handling
+- **System Integration Tests** (`GrpcConnectorSystemIT`): Full end-to-end testing with Testcontainers
+  - Spins up Kafka and Kafka Connect containers
+  - Deploys connector via REST API
+  - Verifies connector plugin loading and status
+
+> **Note**: System integration tests require Docker to be running
 
 ## License
 

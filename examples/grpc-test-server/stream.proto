@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package teststream;
+
+option go_package = "./;main";
+
+// TestStreamService provides a server streaming RPC for testing
+service TestStreamService {
+  // StreamEvents sends a continuous stream of events
+  rpc StreamEvents(StreamRequest) returns (stream StreamEvent);
+}
+
+// StreamRequest is the request message
+message StreamRequest {
+  // Optional filter for events
+  string filter = 1;
+  // Interval between events in milliseconds (default: 1000)
+  int32 interval_ms = 2;
+}
+
+// StreamEvent is a single event in the stream
+message StreamEvent {
+  // Unique event ID
+  string event_id = 1;
+  // Event timestamp (ISO 8601)
+  string timestamp = 2;
+  // Event type
+  string event_type = 3;
+  // Event payload (JSON string)
+  string payload = 4;
+  // Sequence number
+  int64 sequence = 5;
+}

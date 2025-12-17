@@ -144,6 +144,32 @@ Includes comprehensive operational tooling:
 
     This enables reliable message delivery and helps identify potential data loss scenarios. However, the connector cannot replay messages from the gRPC server - it can only detect gaps in the sequence.
 
+## Development & Testing
+
+### Building from Source
+
+```bash
+git clone https://github.com/conduktor/kafka-connect-grpc.git
+cd kafka-connect-grpc
+mvn clean package
+```
+
+### Running Tests
+
+```bash
+# Unit tests
+mvn test
+
+# Integration tests (requires Docker)
+mvn verify
+```
+
+The test suite includes:
+
+- **Unit Tests**: Configuration validation, connector lifecycle, task management
+- **Integration Tests**: gRPC client behavior, TLS configuration, proto descriptor handling
+- **System Integration Tests** (`GrpcConnectorSystemIT`): Full end-to-end testing with Testcontainers that spins up Kafka + Kafka Connect containers
+
 ## Community & Support
 
 - **GitHub Issues**: [Report bugs and request features](https://github.com/conduktor/kafka-connect-grpc/issues)
