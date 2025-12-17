@@ -91,11 +91,43 @@ services:
         echo "Proto descriptor found at /opt/kafka/proto/stream.desc"
         /opt/kafka/bin/connect-standalone.sh /tmp/connect-standalone.properties
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8083/ || exit 1"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8083' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 15
       start_period: 30s
+
+  # Auto-deploy the connector once Kafka Connect is ready
+  connector-deploy:
+    image: curlimages/curl:latest
+    container_name: connector-deploy-grpc
+    depends_on:
+      kafka-connect:
+        condition: service_healthy
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - |
+        echo "Deploying gRPC Source Connector..."
+        curl -X POST http://kafka-connect:8083/connectors \
+          -H "Content-Type: application/json" \
+          -d '{
+            "name": "grpc-test-source",
+            "config": {
+              "connector.class": "io.conduktor.connect.grpc.GrpcSourceConnector",
+              "tasks.max": "1",
+              "grpc.server.host": "grpc-server",
+              "grpc.server.port": "50051",
+              "grpc.service.name": "teststream.TestStreamService",
+              "grpc.method.name": "StreamEvents",
+              "grpc.request.message": "{\"interval_ms\": 2000}",
+              "grpc.proto.descriptor": "/opt/kafka/proto/stream.desc",
+              "kafka.topic": "grpc-events"
+            }
+          }'
+        echo ""
+        echo "Connector deployed! Check status at http://localhost:8083/connectors/grpc-test-source/status"
 
   # Conduktor Console for viewing topics
   postgresql:
