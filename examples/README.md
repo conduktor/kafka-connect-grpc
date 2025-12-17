@@ -21,14 +21,9 @@ docker compose up -d --build
 # Wait for services to be healthy (about 30-60 seconds)
 docker compose ps
 
-# Generate the proto descriptor for the connector
-docker compose exec grpc-server cat /app/stream.proto > /tmp/stream.proto
-protoc --descriptor_set_out=/tmp/stream.desc --include_imports /tmp/stream.proto
+# The proto descriptor is automatically generated and shared between containers
 
-# Or use the pre-generated one from the test server
-# The descriptor is generated during the Docker build
-
-# Deploy the gRPC connector
+# Deploy the gRPC connector (with proto descriptor for message handling)
 curl -X POST http://localhost:8083/connectors \
   -H "Content-Type: application/json" \
   -d '{
@@ -41,6 +36,7 @@ curl -X POST http://localhost:8083/connectors \
       "grpc.service.name": "teststream.TestStreamService",
       "grpc.method.name": "StreamEvents",
       "grpc.request.message": "{\"interval_ms\": 2000}",
+      "grpc.proto.descriptor": "/opt/kafka/proto/stream.desc",
       "kafka.topic": "grpc-events"
     }
   }'
@@ -116,6 +112,7 @@ grpcurl -plaintext -d '{"interval_ms": 1000}' \
     "grpc.server.port": "50051",
     "grpc.service.name": "teststream.TestStreamService",
     "grpc.method.name": "StreamEvents",
+    "grpc.proto.descriptor": "/opt/kafka/proto/stream.desc",
     "kafka.topic": "grpc-events"
   }
 }
@@ -132,6 +129,7 @@ grpcurl -plaintext -d '{"interval_ms": 1000}' \
     "grpc.server.port": "50051",
     "grpc.service.name": "teststream.TestStreamService",
     "grpc.method.name": "StreamEvents",
+    "grpc.proto.descriptor": "/opt/kafka/proto/stream.desc",
     "grpc.request.message": "{\"filter\": \"order.placed\", \"interval_ms\": 500}",
     "kafka.topic": "grpc-orders"
   }
@@ -149,6 +147,7 @@ grpcurl -plaintext -d '{"interval_ms": 1000}' \
     "grpc.server.port": "50051",
     "grpc.service.name": "teststream.TestStreamService",
     "grpc.method.name": "StreamEvents",
+    "grpc.proto.descriptor": "/opt/kafka/proto/stream.desc",
     "grpc.reconnect.enabled": "true",
     "grpc.reconnect.interval.ms": "3000",
     "grpc.reconnect.max.attempts": "10",

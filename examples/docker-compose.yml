@@ -34,6 +34,16 @@ services:
     container_name: grpc-test-server
     ports:
       - "50051:50051"
+    volumes:
+      - proto-descriptors:/app/shared
+    command:
+      - sh
+      - -c
+      - |
+        # Copy proto descriptor to shared volume for kafka-connect
+        cp /app/stream.desc /app/shared/stream.desc
+        echo "Proto descriptor copied to shared volume"
+        exec /server
     healthcheck:
       test: ["CMD", "/grpc_health_probe", "-addr=:50051"]
       interval: 5s
@@ -56,6 +66,7 @@ services:
       KAFKA_HEAP_OPTS: "-Xms512M -Xmx1G"
     volumes:
       - ../target:/opt/kafka/plugins/kafka-connect-grpc
+      - proto-descriptors:/opt/kafka/proto
     command:
       - bash
       - -c
@@ -70,8 +81,14 @@ services:
         rest.host.name=0.0.0.0
         rest.port=8083
         PROPS
-        echo 'Waiting for Kafka...'
+        echo 'Waiting for Kafka and proto descriptor...'
         sleep 5
+        # Wait for proto descriptor to be available
+        while [ ! -f /opt/kafka/proto/stream.desc ]; do
+          echo "Waiting for proto descriptor..."
+          sleep 2
+        done
+        echo "Proto descriptor found at /opt/kafka/proto/stream.desc"
         /opt/kafka/bin/connect-standalone.sh /tmp/connect-standalone.properties
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8083/ || exit 1"]
@@ -113,3 +130,6 @@ services:
       CDK_CLUSTERS_0_KAFKACONNECTS_0_ID: local-connect
       CDK_CLUSTERS_0_KAFKACONNECTS_0_NAME: local-connect
       CDK_CLUSTERS_0_KAFKACONNECTS_0_URL: http://kafka-connect:8083
+
+volumes:
+  proto-descriptors:
