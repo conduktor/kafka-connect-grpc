@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/changelog/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/faq/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/getting-started/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/getting-started/configuration/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/getting-started/prerequisites/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+    <url>
+         <loc>https://conduktor.github.io/kafka-connect-grpc/operations/RUNBOOK/</loc>
+         <lastmod>2025-12-17</lastmod>
+    </url>
+</urlset>
